@@ -6,6 +6,9 @@ var express = require("express"),
 var router = express.Router();
 var port = process.env.PORT || 3977;
 var UserCtrl = require('./Controllers/UserCtrl');
+var md_auth=require('./middlewares/authenticated');
+var multipart = require('connect-multiparty');
+var md_upload= multipart({uploadDir:'./uploads/users'});
 /*
   Conexion a MongoDB por medio del servicio MongoLab
 */
@@ -24,11 +27,13 @@ app.use(bodyParser.json({limit: '10mb'}));
 app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
 app.use(methodOverride());
 
-//router
+/*
+  Routes /api/
+*/
 var user = express.Router();
 
-user.route('/users')
-  .get(UserCtrl.pruebas);
+user.route('/user')
+  .get(md_auth.ensureAuth,UserCtrl.pruebas);
 
 user.route('/register')
   .post(UserCtrl.saveUser);
@@ -36,5 +41,13 @@ user.route('/register')
 user.route('/login')
   .post(UserCtrl.loginUser);
 
+user.route('/update-user/:id')
+  .put(md_auth.ensureAuth,UserCtrl.updateUser);
+
+user.route('/upload-avatar/:id')
+  .post([md_auth.ensureAuth,md_upload],UserCtrl.uploadImage);
+
+user.route('/get-avatar/:imageFile')
+  .get(UserCtrl.getImageFile);
 
 app.use('/api', user);
