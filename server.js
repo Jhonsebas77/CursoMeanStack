@@ -6,9 +6,15 @@ var express = require("express"),
 var router = express.Router();
 var port = process.env.PORT || 3977;
 var UserCtrl = require('./Controllers/UserCtrl');
+var ArtistCtrl = require('./Controllers/ArtistCtrl');
+var AlbumCtrl = require('./Controllers/AlbumCtrl');
+var SongCtrl = require('./Controllers/SongCtrl');
 var md_auth=require('./middlewares/authenticated');
 var multipart = require('connect-multiparty');
-var md_upload= multipart({uploadDir:'./uploads/users'});
+var md_upload_user = multipart({uploadDir:'./uploads/users'});
+var md_upload_artist = multipart({uploadDir:'./uploads/artist'});
+var md_upload_album = multipart({uploadDir:'./uploads/album'});
+var md_upload_song = multipart({uploadDir:'./uploads/song'});
 /*
   Conexion a MongoDB por medio del servicio MongoLab
 */
@@ -31,23 +37,53 @@ app.use(methodOverride());
   Routes /api/
 */
 var user = express.Router();
-
-user.route('/user')
-  .get(md_auth.ensureAuth,UserCtrl.pruebas);
+var artist = express.Router();
+var album = express.Router();
+var song = express.Router();
 
 user.route('/register')
   .post(UserCtrl.saveUser);
-
 user.route('/login')
   .post(UserCtrl.loginUser);
-
 user.route('/update-user/:id')
   .put(md_auth.ensureAuth,UserCtrl.updateUser);
-
-user.route('/upload-avatar/:id')
-  .post([md_auth.ensureAuth,md_upload],UserCtrl.uploadImage);
-
-user.route('/get-avatar/:imageFile')
+user.route('/upload-avatar-user/:id')
+  .post([md_auth.ensureAuth,md_upload_user],UserCtrl.uploadImage);
+user.route('/get-avatar-user/:imageFile')
   .get(UserCtrl.getImageFile);
+//Artista
+artist.route('/artist/:id')
+  .get(md_auth.ensureAuth,ArtistCtrl.getArtist)
+  .put(md_auth.ensureAuth,ArtistCtrl.updateArtist)
+  .delete(md_auth.ensureAuth,ArtistCtrl.deleteArtist);
+artist.route('/register')
+  .post(md_auth.ensureAuth,ArtistCtrl.saveArtist);
+artist.route('/get-allArtists')
+  .get(md_auth.ensureAuth,ArtistCtrl.getAllArtists);
+artist.route('/upload-avatar-artist/:id')
+  .post([md_auth.ensureAuth,md_upload_artist],ArtistCtrl.uploadImage);
+artist.route('/get-avatar-artist/:imageFile')
+  .get(ArtistCtrl.getImageFile);
+//Album
+album.route('/register')
+  .get(AlbumCtrl.getAlbum)
+  .post(AlbumCtrl.saveAlbum);
+album.route('/album/:id')
+  .get(md_auth.ensureAuth,AlbumCtrl.getAlbum)
+  .put(md_auth.ensureAuth,AlbumCtrl.updateAlbum)
+  .delete(md_auth.ensureAuth,AlbumCtrl.deleteAlbum);
+album.route('/get-allAlbums/:artist?')
+  .get(md_auth.ensureAuth,AlbumCtrl.getAllAlbums);
+album.route('/upload-avatar-album/:id')
+  .post([md_auth.ensureAuth,md_upload_album],AlbumCtrl.uploadImage);
+album.route('/get-avatar-album/:imageFile')
+  .get(AlbumCtrl.getImageFile);
+//Song
+song.route('/register')
+  .post(SongCtrl.getSong);
 
-app.use('/api', user);
+
+app.use('/api/users', user);
+app.use('/api/artist', artist);
+app.use('/api/album', album);
+app.use('/api/song', song);

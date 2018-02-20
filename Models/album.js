@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const Schema   = mongoose.Schema
 
 const AlbumSchema = new Schema({
-  name:   { type: String },
+  title:   { type: String },
   description:   { type: String },
   year:   { type: Number },
   image:   { type: String },

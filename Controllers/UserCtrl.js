@@ -12,9 +12,6 @@ exports.pruebas = function(req,res){
 exports.saveUser=function(req,res){
   const user = new User();
   const params = req.body;
-
-  console.log(params);
-
   user.name=params.name;
   user.surname=params.surname;
   user.email=params.email;
