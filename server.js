@@ -18,7 +18,7 @@ var md_upload_song = multipart({uploadDir:'./uploads/song'});
 /*
   Conexion a MongoDB por medio del servicio MongoLab
 */
-mongoose.connect('mongodb://Sebastian:12345@ds111638.mlab.com:11638/otadb',(err,res)=>{
+mongoose.connect('mongodb://JSOB:Mean123@ds119755.mlab.com:19755/meanstack',(err,res)=>{
   if(err){
     console.log('ERROR: connecting to Database. ' + err);
   }  else {
