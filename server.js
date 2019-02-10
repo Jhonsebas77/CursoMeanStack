@@ -41,6 +41,8 @@ var artist = express.Router();
 var album = express.Router();
 var song = express.Router();
 
+user.route('/test')
+  .get(UserCtrl.pruebas);
 user.route('/register')
   .post(UserCtrl.saveUser);
 user.route('/login')

@@ -6,7 +6,7 @@ const Album = require('../Models/album');
 const Song = require('../Models/song');
 
 exports.getSong = function (req, res) {
-  var songId = req.params.id;
+  const songId = req.params.id;
   Song.findById(songId).populate({ path: 'artist' }).exec((err, album) => {
     if (err) {
       res.status(500).send({ message: 'Error  en la peticion' });

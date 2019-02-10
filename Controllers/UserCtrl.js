@@ -11,15 +11,15 @@ exports.pruebas = function (req, res) {
 };
 exports.saveUser = function (req, res) {
   const user = new User();
-  const params = req.body;
-  user.name = params.name;
-  user.surname = params.surname;
-  user.email = params.email;
+  const { name, surname, email, password } = { ...req.body };
+  user.name = name;
+  user.surname = surname;
+  user.email = email;
   user.role = 'ROLE_USER';
   user.image = 'null';
 
-  if (params.password) {
-    bcrypt.hash(params.password, null, null, function (err, hash) {
+  if (password) {
+    bcrypt.hash(password, null, null, function (err, hash) {
       user.password = hash;
       if (user.name != null && user.surname != null && user.email != null) {
         user.save((err, userStored) => {
@@ -38,13 +38,11 @@ exports.saveUser = function (req, res) {
       }
     });
   } else {
-    res.status(200).send({ message: 'Introduce la Contrasena' });
+    res.status(500).send({ message: 'Introduce la Contrasena' });
   }
 };
 exports.loginUser = function (req, res) {
-  var params = req.body;
-  var email = params.email;
-  var password = params.password;
+  const { email = '', password, gethash } = { ...req.body }
 
   User.findOne({ email: email.toLowerCase() }, (err, user) => {
     if (err) {
@@ -55,7 +53,7 @@ exports.loginUser = function (req, res) {
       } else {
         bcrypt.compare(password, user.password, function (req, check) {
           if (check) {
-            if (params.gethash) {
+            if (gethash) {
               res.status(200).send({
                 token: jwt.createToken(user)
               });
@@ -71,27 +69,24 @@ exports.loginUser = function (req, res) {
   });
 }
 exports.saveAdmin = function (req, res) {
-  const user = new User();
-  const params = req.body;
-
-  console.log(params);
-
-  user.name = params.name;
-  user.surname = params.surname;
-  user.email = params.email;
+  let user = new User();
+  const { name, surname, email, password } = { ...req.body };
+  user.name = name;
+  user.surname = surname;
+  user.email = email;
   user.role = 'ROLE_ADMIN';
   user.image = 'null';
 
-  if (params.password) {
-    bcrypt.hash(params.password, null, null, function (err, hash) {
+  if (password) {
+    bcrypt.hash(password, null, null, function (err, hash) {
       user.password = hash;
       if (user.name != null && user.surname != null && user.email != null) {
         user.save((err, userStored) => {
           if (err) {
-            res.status(500).send({ message: 'Error al guardar el usuario' });
+            res.status(500).send({ message: 'Error al guardar el Administrador' });
           } else {
             if (!userStored) {
-              res.status(404).send({ message: 'No se ha registrado el usuario' });
+              res.status(404).send({ message: 'No se ha registrado el Administrador' });
             } else {
               res.status(200).send({ user: userStored });
             }
@@ -106,8 +101,8 @@ exports.saveAdmin = function (req, res) {
   }
 };
 exports.updateUser = function (req, res) {
-  var userId = req.params.id;
-  var update = req.body;
+  const userId = req.params.id;
+  const update = req.body;
   User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
     if (err) {
       res.status(500).send({ message: 'Error al actualizar el usuario' });
@@ -121,15 +116,15 @@ exports.updateUser = function (req, res) {
   });
 };
 exports.uploadImage = function (req, res) {
-  var userId = req.params.id;
-  var file_name = 'Sin Imagen';
+  const userId = req.params.id;
+  const file_name = 'Sin Imagen';
 
   if (req.files) {
-    var file_path = req.files.image.path;
-    var file_split = file_path.split('/');
-    var file_name = file_split[2];
-    var ext_split = file_name.split('.');
-    var file_ext = ext_split[1];
+    const file_path = req.files.image.path;
+    const file_split = file_path.split('/');
+    const file_name = file_split[2];
+    const ext_split = file_name.split('.');
+    const file_ext = ext_split[1];
 
     if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'gif') {
       User.findByIdAndUpdate(userId, { image: file_name }, (err, userUpdated) => {
@@ -152,8 +147,8 @@ exports.uploadImage = function (req, res) {
   }
 };
 exports.getImageFile = function (req, res) {
-  var imageFile = req.params.imageFile;
-  var path_file = './uploads/users/' + imageFile;
+  const imageFile = req.params.imageFile;
+  const path_file = './uploads/users/' + imageFile;
   fs.exists(path_file, (exists) => {
     if (exists) {
       res.sendFile(path.resolve(path_file));

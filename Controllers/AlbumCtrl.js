@@ -6,7 +6,7 @@ const Album = require('../Models/album');
 const Song = require('../Models/song');
 
 exports.getAlbum = function (req, res) {
-  var albumId = req.params.id;
+  const albumId = req.params.id;
   Album.findById(albumId).populate({ path: 'artist' }).exec((err, album) => {
     if (err) {
       res.status(500).send({ message: 'Error en la peticion' });
@@ -20,8 +20,8 @@ exports.getAlbum = function (req, res) {
   });
 };
 exports.saveAlbum = function (req, res) {
-  var album = new Album();
-  var params = req.body;
+  const album = new Album();
+  const params = req.body;
 
   album.title = params.title;
   album.description = params.description;
@@ -42,12 +42,12 @@ exports.saveAlbum = function (req, res) {
   });
 };
 exports.getAllAlbums = function (req, res) {
-  var artistId = req.params.id;
+  const artistId = req.params.id;
 
   if (!artistId) {
-    var find = Album.find({}).sort('title');
+    const find = Album.find({}).sort('title');
   } else {
-    var find = Album.find({ artist: artistId }).sort('year');
+    const find = Album.find({ artist: artistId }).sort('year');
   }
 
   find.populate({ path: 'artist' }).exec((err, albums) => {
@@ -64,8 +64,8 @@ exports.getAllAlbums = function (req, res) {
 
 };
 exports.updateAlbum = function (req, res) {
-  var albumId = req.params.id;
-  var update = req.body;
+  const albumId = req.params.id;
+  const update = req.body;
 
   Album.findByIdAndUpdate(albumId, update, (err, albumUpdated) => {
     if (err) {
@@ -82,7 +82,7 @@ exports.updateAlbum = function (req, res) {
   });
 };
 exports.deleteAlbum = function (req, res) {
-  var albumId = req.params.id;
+  const albumId = req.params.id;
   Album.findByIdAndRemove(albumId, (err, albumRemoved) => {
     if (err) {
       res.status(500).send({ message: 'Error al eliminar el album' });
@@ -107,15 +107,15 @@ exports.deleteAlbum = function (req, res) {
 
 };
 exports.uploadImage = function (req, res) {
-  var albumId = req.params.id;
-  var file_name = 'Sin Imagen';
+  const albumId = req.params.id;
+  const file_name = 'Sin Imagen';
 
   if (req.files) {
-    var file_path = req.files.image.path;
-    var file_split = file_path.split('/');
-    var file_name = file_split[2];
-    var ext_split = file_name.split('.');
-    var file_ext = ext_split[1];
+    const file_path = req.files.image.path;
+    const file_split = file_path.split('/');
+    const file_name = file_split[2];
+    const ext_split = file_name.split('.');
+    const file_ext = ext_split[1];
 
     if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'gif') {
       User.findByIdAndUpdate(albumId, { image: file_name }, (err, userUpdated) => {
@@ -138,8 +138,8 @@ exports.uploadImage = function (req, res) {
   }
 };
 exports.getImageFile = function (req, res) {
-  var imageFile = req.params.imageFile;
-  var path_file = './uploads/album/' + imageFile;
+  const imageFile = req.params.imageFile;
+  const path_file = './uploads/album/' + imageFile;
   fs.exists(path_file, (exists) => {
     if (exists) {
       res.sendFile(path.resolve(path_file));
